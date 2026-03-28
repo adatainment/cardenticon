@@ -1,7 +1,5 @@
-.DS_Store
 node_modules
-*.iml
-lib/
-tsconfig.tsbuildinfo
-yarn.lock
+dist
+*.tgz
+.DS_Store
 *.log

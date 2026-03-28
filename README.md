@@ -1,152 +1,67 @@
-Hashicon
-==========
+# cardenticon
 
-[![GitHub tag](https://img.shields.io/github/tag/ETCDEVTeam/hashicon.svg)](https://GitHub.com/emeraldpay/hashicon/tags/)
-[![npm](http://img.shields.io/npm/v/@emeraldpay/hashicon.svg)](https://www.npmjs.com/package/@emeraldpay/hashicon)
-[![License](https://img.shields.io/npm/l/@emeraldpay/hashicon.svg)](LICENSE)
+Deterministic hexagonal identicons for Cardano addresses. SVG output, zero dependencies, SSR-ready.
 
-> Generates a beautiful representation of any hash.
+Derived from [hashicon](https://github.com/emeraldpay/hashicon) by EmeraldPay — rewritten for Cardano with SVG rendering and zero dependencies.
 
-![Sample hashicon image](examples/hashicons.png "Hashicons")
+## Install
 
-Usage
------
-
-Install with: 
-```shell
-$ npm install @emeraldpay/hashicon --save
-```   
-
-Something that you want to represent visually. For example ID of an object on the screen.
-```js
-const hash = "9dddff8f-be81-4c27-80c8-099327865f3f";
+```bash
+npm install cardenticon
 ```
 
-Create a `hashicon` with default params:
-```js
-import { hashicon } from 'hashicon';
+## Usage
 
-const icon = hashicon(hash); // icon is a <canvas> element
-const icon = hashicon(hash, 80);  // size 80px
+```typescript
+import { cardenticon, cardenticonDataURL } from 'cardenticon';
+
+// SVG string — use in innerHTML, SSR templates, etc.
+const svg = cardenticon('addr1qx2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp');
+
+// Data URL — use in <img src="...">
+const url = cardenticonDataURL('addr1q...');
+
+// Custom size
+const small = cardenticon('addr1q...', { size: 48 });
 ```
 
-Or, pass custom [params](#params):
-```js
-const params = {...};
-const icon = hashicon(hash, params);
+### Supported inputs
+
+| Input | Handling |
+|-------|----------|
+| `addr1...` | Cardano mainnet address — bech32 decoded, credential hash used directly |
+| `addr_test1...` | Cardano testnet address |
+| `stake1...` | Stake address |
+| `stake_test1...` | Testnet stake address |
+| Hex string (14+ chars) | Used as raw bytes |
+| Any other string | Hashed internally (cyrb128) |
+
+### Options
+
+```typescript
+cardenticon(input, {
+  size: 100,                              // icon size in px
+  hue: { min: 0, max: 360 },             // hue range
+  saturation: { min: 70, max: 100 },      // saturation %
+  lightness: { min: 45, max: 65 },        // lightness %
+  variation: { min: 5, max: 20, enabled: true },
+  shift: { min: 60, max: 300 },           // figure overlay hue shift
+  figureAlpha: { min: 0.7, max: 1.2 },   // figure overlay opacity
+  light: { top: 10, right: -8, left: -4, enabled: true },
+});
 ```
 
-Finally, append the newly created `hashicon` to the HTML document:
-```js
-document.body.appendChild(icon);
-```
+## Why not hashicon directly?
 
-React
------
+- **SVG output** — hashicon is Canvas-only and requires a DOM. Cardenticon outputs SVG strings that work everywhere: SSR, Cloudflare Workers, Node.js, browser.
+- **Cardano-native** — decodes bech32 addresses and uses the credential hash directly instead of re-hashing through BLAKE2s.
+- **Zero dependencies** — hashicon depends on `@stablelib/blake2s` and `js-sha3`. Cardenticon has none.
+- **18 KB minified** — ESM + CJS dual package with TypeScript declarations.
 
-Install with: 
-```shell
-$ npm install @emeraldpay/hashicon-react --save
-```   
+## Performance
 
-And use the component:
+~28µs per icon (~35,000 icons/second) on Apple Silicon.
 
-```js
-import { Hashicon } from 'hashicon-react';
+## License
 
-// something that you want to represent visually. For example ID of an object on the screen.
-const value = "9dddff8f-be81-4c27-80c8-099327865f3f";
-
-// icon is a <canvas> element
-<Hashicon value={value}/>
-
-// Same icon with 80px in size
-<Hashicon value={value} size={89}/>
-```
-
-Params
----
-> See [default params](src/params.ts)
-
-HashIcon's values are extracted from the hash, and controlled with the following parameters to manipulate the possible visual output:
-
-```js
-{
-
-// size px (HiDPI/Retina aware)
-size: 100,
-
-// primary color range radius ( 0=red, 60=yellow, 120=green, ..., 360=red )
-hue: { min: 0, max: 360 },
-
-// saturation ( 0=grey, 100=colorfull )
-saturation: { min: 70, max: 100 },
-
-// lightness ( 0=extremlydark, 50=optimal, 100=extremlybright )
-lightness: { min: 45, max: 65 },
-
-// hue variation for individual triangles
-variation: { min: 7, max: 14, enabled: true },
-
-// color shift from primary hue to secondary hue ( the pattern )
-shift: { min: 60, max: 300 },
-
-// the pattern opacity
-figurealpha: { min: .7, max: 1.2 }, // alpha
-
-// simulate a 3d cube by different areas gets some more/less light applyed 
-light:{ top:10, right:-8, left:-4, enabled: true},
-
-// Allows a custom canvas to be used to render into
-createCanvas: (width, height) => HTMLCanvasElement
-
-}
-```
-
-Development
------------
-
-1. Install package dependencies locally:
-```shell
-$ yarn install
-```
-
-2. Start development environment:
-```shell
-$ yarn workspace @emeraldpay/hashicon run storybook
-```
-
-A browser pointing to Storybook demo will start automatically. 
-If not opened, see console for:
-
-```
-╭─────────────────────────────────────────────────────╮
-│                                                     │
-│   Storybook 5.3.19 started                          │
-│   3.62 s for manager and 3.32 s for preview         │
-│                                                     │
-│    Local:            http://localhost:60490/        │
-│    On your network:  http://192.168.0.100:60490/    │
-│                                                     │
-╰─────────────────────────────────────────────────────╯
-```
-
-And open the _local_ url (http://localhost:60490/ in the example above)
-
-Build
------
-
-```shell
-$ yarn build
-```
-
-> Builds package into `lib/` folder inside each package.
-
-License
------
-
-Apache 2
-
-See [LICENSE](LICENSE)
-
-
+Apache-2.0 — see [LICENSE](LICENSE) and [NOTICE](NOTICE) for attribution.

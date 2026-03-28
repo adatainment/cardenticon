@@ -1,11 +1,48 @@
 {
-  "private": true,
-  "license": "Apache-2.0",
-  "scripts": {
-    "build": "yarn workspaces run build"
+  "name": "cardenticon",
+  "version": "0.1.0",
+  "description": "Deterministic hexagonal identicons for Cardano addresses — SVG, zero dependencies, SSR-ready",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
   },
-  "workspaces": [
-    "packages/hashicon",
-    "packages/hashicon-react"
-  ]
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch"
+  },
+  "keywords": [
+    "cardano",
+    "identicon",
+    "avatar",
+    "hash",
+    "icon",
+    "address",
+    "blockchain",
+    "svg",
+    "ssr"
+  ],
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/adatainment/cardenticon"
+  },
+  "devDependencies": {
+    "tsup": "^8.4.0",
+    "typescript": "^5.7.0"
+  }
 }

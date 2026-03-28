@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>cardenticon</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: #0a0a0f;
+      color: #e0e0e0;
+      min-height: 100vh;
+      padding: 3rem 2rem;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2rem;
+      font-weight: 300;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.5rem;
+      color: #fff;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9rem;
+      margin-bottom: 3rem;
+    }
+
+    .input-section {
+      max-width: 640px;
+      margin: 0 auto 3rem;
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    input {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      border: 1px solid #2a2a35;
+      border-radius: 8px;
+      background: #12121a;
+      color: #e0e0e0;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 0.85rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus { border-color: #4a4a5a; }
+
+    input::placeholder { color: #444; }
+
+    button {
+      padding: 0.75rem 1.5rem;
+      border: 1px solid #2a2a35;
+      border-radius: 8px;
+      background: #1a1a25;
+      color: #e0e0e0;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+
+    button:hover { background: #252530; }
+
+    .custom-result {
+      max-width: 640px;
+      margin: 0 auto 3rem;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 1.5rem;
+      background: #12121a;
+      border-radius: 12px;
+      border: 1px solid #1e1e28;
+      display: none;
+    }
+
+    .custom-result.visible { display: flex; }
+
+    .custom-result .addr {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 0.75rem;
+      color: #888;
+      word-break: break-all;
+      line-height: 1.5;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1.5rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: #12121a;
+      border: 1px solid #1e1e28;
+      border-radius: 12px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .card:hover {
+      border-color: #2e2e3a;
+      transform: translateY(-2px);
+    }
+
+    .card svg { border-radius: 8px; }
+
+    .card .label {
+      font-size: 0.7rem;
+      color: #555;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      text-align: center;
+      word-break: break-all;
+      line-height: 1.4;
+    }
+
+    .sizes {
+      display: flex;
+      align-items: end;
+      gap: 1rem;
+      justify-content: center;
+      margin-bottom: 3rem;
+    }
+
+    .sizes .size-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .sizes .size-label {
+      font-size: 0.7rem;
+      color: #555;
+    }
+
+    h2 {
+      text-align: center;
+      font-size: 1rem;
+      font-weight: 400;
+      color: #666;
+      margin-bottom: 1.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+    }
+  </style>
+</head>
+<body>
+  <h1>cardenticon</h1>
+  <p class="subtitle">Deterministic hexagonal identicons for Cardano addresses</p>
+
+  <div class="input-section">
+    <input type="text" id="addressInput" placeholder="Enter a Cardano address (addr1...)">
+    <button onclick="generateCustom()">Generate</button>
+  </div>
+
+  <div class="custom-result" id="customResult">
+    <div id="customIcon"></div>
+    <div class="addr" id="customAddr"></div>
+  </div>
+
+  <h2>Sizes</h2>
+  <div class="sizes" id="sizes"></div>
+
+  <h2>Sample addresses</h2>
+  <div class="grid" id="grid"></div>
+
+  <script type="module">
+    import { cardenticon } from '../dist/index.js';
+
+    window.cardenticon = cardenticon;
+
+    const sampleAddresses = [
+      'addr1qx2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp',
+      'addr1q9u5sjt5fakxgm7rd7qqyawntmcf4hr4kg0cjkgfmn9y3hldqg35fnk7mqgcal2ex98w0v970thpeyz0lsag7ppxe6l3qu9atcz',
+      'addr1qyht4ja0zcn45qvyx477qzp5y5z2m65vaf5vxwad5aed44s8m3tfxj24zatf42gdq3kzrsgvat0tax4hqs4sxejafrxg5s6g4d44',
+      'addr1q8gg2r3vf9zggn48g972rqc8drywlkle0yrleylmsp2s2atfpvpswfh9dlz0t9kfmkugj26lrrg94wvadzk6g5spmts6gseyc2ky',
+      'addr1qxck06sr78hxw3mfw5nhplalwh0svhsl7xd4km5kmrwzhewr3v4lmpey4esxuaqnxp9nd7l3m8wy2wvfqe6gkl3s6s8l6q24jkz',
+      'addr1v8fet8gavr6elqt6q50skkjf025zthqu6vr56l70ar8la6lgqu3f7a6',
+      'stake1u9frlh9lvpdjva46ge0yut2kl24lmkespe3zxms73prsjadc2ldkcp',
+      'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp',
+      'addr1q9jmp0r3nqe30g3xgpsxkz7krm7kxrlmvxfvhfqsng4pv247wm4tqtqy3f8d0v29w0l9suns2p0x5c8e2thcxz8lkrs2smmz5fk',
+      'addr1qxdvcswn0exwc2vjfr8ykgeg5ev55wm7j7wm7snnagdwpcwz05adzqfp9h8ga2rz37svrplefdaqe3acj05c6qgzz4msgs44sfcd',
+      'addr1q9gd22r5hr9797gp69xfjrp64rz6765mzgu32s0lyv3pzdaqg4tp4ts2fe0gg8xa50nqvag6dtwrm7vqv4t2l0j5psr5mq8ycvkm',
+      'addr1qy0gg4mnv54vwn7p7ck3dpz7n3gmqjawtvz7qzrp2q27mun3e7kg2r9zl2hppv47h2dcmf7c7kqe0gwpy7dtkgq5lp67s8rv6mz',
+    ];
+
+    // Render size variants
+    const sizesEl = document.getElementById('sizes');
+    const sizeRef = sampleAddresses[0];
+    [24, 32, 48, 64, 100].forEach(size => {
+      const div = document.createElement('div');
+      div.className = 'size-item';
+      div.innerHTML = `${cardenticon(sizeRef, { size })}<span class="size-label">${size}px</span>`;
+      sizesEl.appendChild(div);
+    });
+
+    // Render sample grid
+    const grid = document.getElementById('grid');
+    sampleAddresses.forEach(addr => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      const short = addr.length > 20
+        ? addr.slice(0, 12) + '...' + addr.slice(-8)
+        : addr;
+      card.innerHTML = `${cardenticon(addr, { size: 100})}<div class="label">${short}</div>`;
+      grid.appendChild(card);
+    });
+
+    // Custom input
+    window.generateCustom = function() {
+      const input = document.getElementById('addressInput').value.trim();
+      if (!input) return;
+      const result = document.getElementById('customResult');
+      document.getElementById('customIcon').innerHTML = cardenticon(input, { size: 100 });
+      document.getElementById('customAddr').textContent = input;
+      result.classList.add('visible');
+    };
+
+    document.getElementById('addressInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') window.generateCustom();
+    });
+  </script>
+</body>
+</html>

@@ -3,6 +3,7 @@
 Deterministic hexagonal identicons for Cardano addresses. SVG output, zero dependencies, SSR-ready.
 
 Derived from [hashicon](https://github.com/emeraldpay/hashicon) by EmeraldPay — rewritten for Cardano with SVG rendering and zero dependencies.
+![cardenticon-demo](https://github.com/user-attachments/assets/152b4bce-b255-4754-b465-12641bfcf12c)
 
 ## Install
 

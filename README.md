@@ -1,5 +1,7 @@
 # cardenticon
 
+[![CI](https://github.com/adatainment/cardenticon/actions/workflows/ci.yml/badge.svg)](https://github.com/adatainment/cardenticon/actions/workflows/ci.yml)
+
 Deterministic hexagonal identicons for Cardano addresses. SVG output, zero dependencies, SSR-ready.
 
 Derived from [hashicon](https://github.com/emeraldpay/hashicon) by EmeraldPay, rewritten for Cardano with SVG rendering and zero dependencies.

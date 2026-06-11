@@ -3,22 +3,36 @@
  *
  * Bech32 encodes data as a human-readable prefix (hrp), a separator "1",
  * and a base-32 string using the charset below. The last 6 characters are
- * a checksum (not validated here — we only need the payload bytes).
+ * a checksum (not validated here, we only need the payload bytes).
  *
  * Cardano address structure after decoding:
  * - Byte 0: header (upper nibble = address type, lower nibble = network id)
  * - Bytes 1-28: payment credential (blake2b-224 hash)
- * - Bytes 29-56: stake credential (blake2b-224 hash) — only for base addresses
+ * - Bytes 29-56: stake credential (blake2b-224 hash), only for base addresses
  */
 
 const CHARSET = 'qpzry9x8gf2tvdw0s3jn54khce6mua7l';
 
 const CARDANO_PREFIXES = ['addr1', 'addr_test1', 'stake1', 'stake_test1'];
 
+// DRep (delegated representative) governance IDs. CIP-129 uses the "drep" prefix
+// with a 1-byte header; CIP-105 (legacy) uses "drep"/"drep_script" with no header.
+const DREP_PREFIXES = ['drep1', 'drep_script1'];
+
+/** Case-insensitive check that a string starts with any of the given prefixes. */
+function hasPrefix(str: string, prefixes: string[]): boolean {
+  const lower = str.toLowerCase();
+  return prefixes.some((p) => lower.startsWith(p));
+}
+
 /** Check if a string looks like a Cardano bech32 address. */
 export function isCardanoAddress(str: string): boolean {
-  const lower = str.toLowerCase();
-  return CARDANO_PREFIXES.some((p) => lower.startsWith(p));
+  return hasPrefix(str, CARDANO_PREFIXES);
+}
+
+/** Check if a string looks like a Cardano DRep ID (CIP-105 or CIP-129). */
+export function isDRepId(str: string): boolean {
+  return hasPrefix(str, DREP_PREFIXES);
 }
 
 /** Decode a bech32 string into its raw payload bytes. */

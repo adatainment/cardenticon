@@ -24,7 +24,9 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "test": "npm run build && node --test test/index.test.ts"
+    "prepare": "npm run build",
+    "typecheck": "tsc --noEmit",
+    "test": "npm run build && node --test test/*.test.ts"
   },
   "keywords": [
     "cardano",

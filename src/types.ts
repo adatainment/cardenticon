@@ -23,7 +23,7 @@ export interface CardenticonOptions {
   shift?: Range;
   /** Opacity multiplier for the figure overlay pattern (default: 0.7-1.2) */
   figureAlpha?: Range;
-  /** 3D lighting offsets per face — positive = brighter (default: top +10, right -8, left -4) */
+  /** 3D lighting offsets per face, positive = brighter (default: top +10, right -8, left -4) */
   light?: Record<Light, number> & { enabled?: boolean };
 }
 

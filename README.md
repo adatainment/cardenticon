@@ -9,8 +9,10 @@ Derived from [hashicon](https://github.com/emeraldpay/hashicon) by EmeraldPay, r
 
 ## Install
 
+Not yet published to npm. Install straight from GitHub (the package builds on install):
+
 ```bash
-npm install cardenticon
+npm install adatainment/cardenticon
 ```
 
 ## Usage

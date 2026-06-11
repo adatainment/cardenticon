@@ -21,23 +21,18 @@ const DEFAULTS: ResolvedOptions = {
  * Convert an input string to raw bytes for the renderer.
  *
  * Resolution order:
- * 1. Cardano bech32 address → decode and use credential hashes directly
- *    (skips the 1-byte header which only encodes address type + network)
- * 2. DRep ID → decode and use the 28-byte credential hash directly
- * 3. Hex string (≥14 chars) → parse as raw bytes
- * 4. Anything else → hash with cyrb128 to produce 16 deterministic bytes
+ * 1. Cardano bech32 address or DRep ID → decode and use the credential hash
+ *    directly (strips the 1-byte header when present)
+ * 2. Hex string (≥14 chars) → parse as raw bytes
+ * 3. Anything else → hash with cyrb128 to produce 16 deterministic bytes
  */
 function resolveBytes(input: string): Uint8Array {
-  if (isCardanoAddress(input)) {
+  if (isCardanoAddress(input) || isDRepId(input)) {
     const payload = decodeBech32(input);
-    return payload.slice(1);
-  }
-  if (isDRepId(input)) {
-    const payload = decodeBech32(input);
-    // DRep IDs come in two encodings: CIP-129 prepends a 1-byte header
-    // (key type + credential type), CIP-105 does not. Strip the header only
-    // when present (29-byte payload) so both encodings of the same credential
-    // render the same icon; the legacy 28-byte payload is the raw hash.
+    // Strip the 1-byte header (address type + network, or the CIP-129 drep tag)
+    // when present. addr/stake and CIP-129 dreps always carry it; CIP-105 dreps
+    // are a bare 28-byte credential hash. Addresses are never 28 bytes, so this
+    // also makes both drep encodings of one credential render the same icon.
     return payload.length === 28 ? payload : payload.slice(1);
   }
   if (isHex(input)) {

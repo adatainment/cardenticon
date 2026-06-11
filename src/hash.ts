@@ -1,5 +1,5 @@
 /**
- * cyrb128 — a fast 128-bit (4x32-bit) non-cryptographic string hash.
+ * cyrb128, a fast 128-bit (4x32-bit) non-cryptographic string hash.
  *
  * Used as fallback for inputs that are neither Cardano addresses nor hex strings.
  * Produces 16 well-distributed bytes from any string, which is enough for all

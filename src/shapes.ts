@@ -2,7 +2,7 @@ import type { Triangle } from './types';
 
 /**
  * The two triangle shapes used to tile the hexagon.
- * Coordinates are in normalized [0,1] space — the renderer scales them to pixel size.
+ * Coordinates are in normalized [0,1] space, the renderer scales them to pixel size.
  *
  * Shape 0: left-pointing triangle (wider, used for fills)
  * Shape 1: right-pointing triangle (narrower, used for edges)

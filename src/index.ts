@@ -1,11 +1,11 @@
-import { isCardanoAddress, decodeBech32 } from './bech32';
+import { isCardanoAddress, isDRepId, decodeBech32 } from './bech32';
 import { hashString, hexToBytes, isHex } from './hash';
 import { renderSVG } from './renderer';
 import type { CardenticonOptions, ResolvedOptions } from './types';
 
 export type { CardenticonOptions, Range, Light } from './types';
 
-/** Default visual parameters — matching the hashicon aesthetic. */
+/** Default visual parameters, matching the hashicon aesthetic. */
 const DEFAULTS: ResolvedOptions = {
   size: 100,
   hue: { min: 0, max: 360 },
@@ -23,13 +23,22 @@ const DEFAULTS: ResolvedOptions = {
  * Resolution order:
  * 1. Cardano bech32 address → decode and use credential hashes directly
  *    (skips the 1-byte header which only encodes address type + network)
- * 2. Hex string (≥14 chars) → parse as raw bytes
- * 3. Anything else → hash with cyrb128 to produce 16 deterministic bytes
+ * 2. DRep ID → decode and use the 28-byte credential hash directly
+ * 3. Hex string (≥14 chars) → parse as raw bytes
+ * 4. Anything else → hash with cyrb128 to produce 16 deterministic bytes
  */
 function resolveBytes(input: string): Uint8Array {
   if (isCardanoAddress(input)) {
     const payload = decodeBech32(input);
     return payload.slice(1);
+  }
+  if (isDRepId(input)) {
+    const payload = decodeBech32(input);
+    // DRep IDs come in two encodings: CIP-129 prepends a 1-byte header
+    // (key type + credential type), CIP-105 does not. Strip the header only
+    // when present (29-byte payload) so both encodings of the same credential
+    // render the same icon; the legacy 28-byte payload is the raw hash.
+    return payload.length === 28 ? payload : payload.slice(1);
   }
   if (isHex(input)) {
     return hexToBytes(input);
@@ -55,7 +64,8 @@ function mergeOptions(options?: Partial<CardenticonOptions>): ResolvedOptions {
  * Generate a deterministic hexagonal SVG identicon.
  *
  * Accepts Cardano bech32 addresses (addr1..., stake1..., addr_test1..., stake_test1...),
- * hex strings, or arbitrary strings (hashed internally via cyrb128).
+ * DRep IDs (drep1..., drep_script1...), hex strings, or arbitrary strings
+ * (hashed internally via cyrb128).
  *
  * The icon is a hexagon composed of 28 triangles in 4 columns. Visual parameters
  * (hue, saturation, lightness, pattern) are derived deterministically from the
@@ -67,7 +77,7 @@ function mergeOptions(options?: Partial<CardenticonOptions>): ResolvedOptions {
  */
 export function cardenticon(input: string, options?: Partial<CardenticonOptions>): string {
   const bytes = resolveBytes(input);
-  // Each byte (0-255) becomes one Uint16 element — used as seeds for visual parameters
+  // Each byte (0-255) becomes one Uint16 element, used as seeds for visual parameters
   const hashValues = new Uint16Array(bytes);
   const opts = mergeOptions(options);
   return renderSVG(hashValues, opts);

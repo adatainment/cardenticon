@@ -39,6 +39,8 @@ const small = cardenticon('addr1q...', { size: 48 });
 | Hex string (14+ chars) | Used as raw bytes |
 | Any other string | Hashed internally (cyrb128) |
 
+A DRep ID in its CIP-129 and CIP-105 encoding resolves to the same credential hash, so both produce the identical icon.
+
 ### Options
 
 ```typescript

@@ -28,8 +28,15 @@ const DEFAULTS: ResolvedOptions = {
  */
 function resolveBytes(input: string): Uint8Array {
   if (isCardanoAddress(input)) {
-    const payload = decodeBech32(input);
-    return payload.slice(1);
+    // A malformed address (bad charset, truncated payload) must not throw:
+    // identicons render untrusted inputs, so fall back to the string hash.
+    try {
+      const payload = decodeBech32(input);
+      if (payload.length > 1) return payload.slice(1);
+    } catch {
+      // fall through to hashString
+    }
+    return hashString(input);
   }
   if (isHex(input)) {
     return hexToBytes(input);

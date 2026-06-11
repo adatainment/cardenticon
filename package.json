@@ -23,7 +23,8 @@
   ],
   "scripts": {
     "build": "tsup",
-    "dev": "tsup --watch"
+    "dev": "tsup --watch",
+    "test": "npm run build && node --test test/index.test.ts"
   },
   "keywords": [
     "cardano",

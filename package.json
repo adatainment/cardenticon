@@ -1,7 +1,7 @@
 {
   "name": "cardenticon",
   "version": "0.1.0",
-  "description": "Deterministic hexagonal identicons for Cardano addresses — SVG, zero dependencies, SSR-ready",
+  "description": "Deterministic hexagonal identicons for Cardano addresses: SVG, zero dependencies, SSR-ready",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",

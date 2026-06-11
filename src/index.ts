@@ -28,12 +28,20 @@ const DEFAULTS: ResolvedOptions = {
  */
 function resolveBytes(input: string): Uint8Array {
   if (isCardanoAddress(input) || isDRepId(input)) {
-    const payload = decodeBech32(input);
-    // Strip the 1-byte header (address type + network, or the CIP-129 drep tag)
-    // when present. addr/stake and CIP-129 dreps always carry it; CIP-105 dreps
-    // are a bare 28-byte credential hash. Addresses are never 28 bytes, so this
-    // also makes both drep encodings of one credential render the same icon.
-    return payload.length === 28 ? payload : payload.slice(1);
+    // A malformed input (bad charset, truncated payload) must not throw:
+    // identicons render untrusted inputs, so fall back to the string hash.
+    try {
+      const payload = decodeBech32(input);
+      // Strip the 1-byte header (address type + network, or the CIP-129 drep tag)
+      // when present. addr/stake and CIP-129 dreps always carry it; CIP-105 dreps
+      // are a bare 28-byte credential hash. Addresses are never 28 bytes, so this
+      // also makes both drep encodings of one credential render the same icon.
+      if (payload.length === 28) return payload;
+      if (payload.length > 1) return payload.slice(1);
+    } catch {
+      // fall through to hashString
+    }
+    return hashString(input);
   }
   if (isHex(input)) {
     return hexToBytes(input);
